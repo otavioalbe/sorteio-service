@@ -1,8 +1,6 @@
 package com.example.sorteioservice.service;
 
-import com.example.sorteioservice.dto.ApostadorDTO;
 import com.example.sorteioservice.entity.Apostador;
-import com.example.sorteioservice.mapper.ApostadorConverter;
 import com.example.sorteioservice.repository.ApostadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +24,9 @@ public class SorteioService {
         //var savedApostador = apostadorRepository.save(ApostadorConverter.fromDTOtoEntity(dto));
         //var successResponse = ApostadorConverter.fromEntityToDTO(savedApostador);
         apostadorRepository.save(dto);
+        //Aposta aposta = new Aposta(dto.getCpf(),)
+
+       // apostasRepository.save(dto.getCpf())
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
