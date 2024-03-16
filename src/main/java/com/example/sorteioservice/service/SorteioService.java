@@ -8,8 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SorteioService {
@@ -24,7 +26,8 @@ public class SorteioService {
     }
 
     public ResponseEntity<Apostador> salvarAposta(Apostador dto){
-        Set<Integer>numerosSorteados = dto.getNumeros();
+        String []numerosDTO = dto.getNumerosAposta().split(",");
+        Set<Integer>numerosSorteados = Arrays.stream(numerosDTO).map(Integer::parseInt).collect(Collectors.toSet());
         if(validaNumerosSorteados(numerosSorteados)){
             apostadorRepository.save(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(dto);

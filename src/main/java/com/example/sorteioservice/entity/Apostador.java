@@ -2,8 +2,6 @@ package com.example.sorteioservice.entity;
 
 import jakarta.persistence.*;
 
-import java.util.Set;
-
 import lombok.*;
 
 @Table(name="apostador")
@@ -17,12 +15,11 @@ public class Apostador {
     // Table strategy
     @TableGenerator(
             name="customID",
-            table="ID_GEN",
-            pkColumnName = "GEN_NAME",
+            table="custom_id",
             valueColumnName = "GEN_VAL",
             pkColumnValue = "customID",
             initialValue = 999,
-            allocationSize = 9999
+            allocationSize = Integer.MAX_VALUE
     )
 
     @Id
@@ -32,8 +29,6 @@ public class Apostador {
     private String cpf;
     @Column(name = "nome")
     private String nome;
-    @ElementCollection
-    @CollectionTable(name = "numeros_sorteio", joinColumns = @JoinColumn(name="apostador_id"))
-    private Set<Integer> numeros;
-
+    @Column(name = "numeros_aposta")
+    private String numerosAposta;
 }
