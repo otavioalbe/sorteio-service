@@ -17,6 +17,11 @@ public class SorteioController {
     @Autowired
     private SorteioService sorteioService;
 
+    @GetMapping("/aberto")
+    public boolean apostaAberta(){
+        return sorteioService.verficarApostaAberta();
+    }
+
     @PostMapping("/apostar")
     public ResponseEntity<Apostador> solicitaAposta(@RequestBody Apostador dto){
         return sorteioService.salvarAposta(dto);
@@ -26,4 +31,8 @@ public class SorteioController {
     public List<Apostador> getAll(){
         return sorteioService.getAll();
     }
+
+
+//    @GetMapping("/executar_sorteio")
+//    public
 }

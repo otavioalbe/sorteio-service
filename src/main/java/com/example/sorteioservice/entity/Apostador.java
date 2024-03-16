@@ -14,7 +14,7 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode(of = "id")
 public class Apostador {
-
+    // Table strategy
     @TableGenerator(
             name="customID",
             table="ID_GEN",
