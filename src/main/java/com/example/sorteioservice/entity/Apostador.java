@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode(of = "id")
 public class Apostador {
-    // Table strategy
+    // Table strategy para inicialização do id em 999
     @TableGenerator(
             name="customID",
             table="custom_id",

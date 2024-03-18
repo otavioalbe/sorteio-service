@@ -4,6 +4,7 @@ import com.example.sorteioservice.dto.ApostadorDTO;
 import com.example.sorteioservice.entity.Apostador;
 import com.example.sorteioservice.service.SorteioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,13 @@ public class SorteioController {
     }
 
 
-//    @GetMapping("/executar_sorteio")
-//    public
+    @GetMapping("/executar-sorteio")
+    public String executarSorteio(){
+        return sorteioService.realizarSorteio();
+    }
+
+    @GetMapping("/reiniciar-aposta")
+    public String reiniciarAposta(){
+        return sorteioService.resetAposta();
+    }
 }

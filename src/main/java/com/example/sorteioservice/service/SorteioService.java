@@ -1,17 +1,15 @@
 package com.example.sorteioservice.service;
 
 import com.example.sorteioservice.entity.Apostador;
+import com.example.sorteioservice.mapper.ApostadorConverter;
 import com.example.sorteioservice.repository.ApostadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class SorteioService {
@@ -20,30 +18,39 @@ public class SorteioService {
 
     @Autowired
     private ApostadorRepository apostadorRepository;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ApostadorConverter apostadorConverter;
 
     public List<Apostador> getAll(){
         return apostadorRepository.findAll();
     }
 
     public ResponseEntity<Apostador> salvarAposta(Apostador dto){
-        String []numerosDTO = dto.getNumerosAposta().split(",");
-        Set<Integer>numerosSorteados = Arrays.stream(numerosDTO).map(Integer::parseInt).collect(Collectors.toSet());
-        if(validaNumerosSorteados(numerosSorteados)){
-            apostadorRepository.save(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        if(apostaAtiva) {
+            Set<Integer> numerosSorteados = apostadorConverter.fromStringToSet(dto);
+            if (validaNumerosSorteados(numerosSorteados)) {
+                apostadorRepository.save(dto);
+                return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+            }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(dto);
-        //var savedApostador = apostadorRepository.save(ApostadorConverter.fromDTOtoEntity(dto));
-        //var successResponse = ApostadorConverter.fromEntityToDTO(savedApostador);
     }
 
     public boolean verficarApostaAberta(){
         return apostaAtiva;
     }
 
-    public Set<Integer> realizarSorteio(){
+    public String realizarSorteio(){
         apostaAtiva = false;
-        return null;
+        Set<Integer> numerosSorteados = new HashSet<>();
+        Random random = new Random();
+        while (numerosSorteados.size() < 5) {
+            int numeroSorteado = random.nextInt(50) + 1;
+            numerosSorteados.add(numeroSorteado);
+        }
+        return apostadorConverter.fromSetToString(numerosSorteados);
     }
 
     public boolean validaNumerosSorteados(Set<Integer>numerosSorteados){
@@ -53,6 +60,18 @@ public class SorteioService {
             }
         }
         return true;
+    }
+
+    public String resetAposta(){
+        apostaAtiva = true;
+        try {
+            jdbcTemplate.update("DELETE FROM APOSTADOR");
+            jdbcTemplate.update("DELETE FROM CUSTOM_ID");
+            jdbcTemplate.execute("INSERT INTO CUSTOM_ID (GEN_VAL, SEQUENCE_NAME) VALUES (999, 'custom_id')");
+            return "Aposta resetada!";
+        } catch (Exception e) {
+            return "Erro ao limpar o cache: " + e.getMessage();
+        }
     }
 
 //    public ApostadorResponse validaAposta(ApostadorResponse dto){
