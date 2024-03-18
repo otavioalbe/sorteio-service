@@ -1,6 +1,5 @@
 package com.example.sorteioservice.entity;
 
-import com.example.sorteioservice.dto.ApostadorRequestDTO;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -13,6 +12,7 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode(of = "id")
 public class Apostador {
+
     // Table strategy para inicialização do id em 999
     @TableGenerator(
             name="customID",

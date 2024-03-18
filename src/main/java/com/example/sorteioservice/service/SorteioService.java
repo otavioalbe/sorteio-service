@@ -2,7 +2,6 @@ package com.example.sorteioservice.service;
 
 import com.example.sorteioservice.dto.ApostadorRequestDTO;
 import com.example.sorteioservice.dto.ApostadorResponseDTO;
-import com.example.sorteioservice.entity.Apostador;
 import com.example.sorteioservice.mapper.ApostaConverter;
 import com.example.sorteioservice.mapper.ApostadorMapper;
 import com.example.sorteioservice.repository.ApostadorRepository;

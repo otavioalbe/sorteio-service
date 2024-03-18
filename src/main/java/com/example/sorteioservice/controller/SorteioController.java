@@ -2,7 +2,6 @@ package com.example.sorteioservice.controller;
 
 import com.example.sorteioservice.dto.ApostadorRequestDTO;
 import com.example.sorteioservice.dto.ApostadorResponseDTO;
-import com.example.sorteioservice.entity.Apostador;
 import com.example.sorteioservice.service.SorteioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

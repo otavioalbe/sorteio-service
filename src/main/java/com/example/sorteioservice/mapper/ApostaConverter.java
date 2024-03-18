@@ -1,8 +1,6 @@
 package com.example.sorteioservice.mapper;
 
 import com.example.sorteioservice.dto.ApostadorRequestDTO;
-import com.example.sorteioservice.dto.ApostadorResponseDTO;
-import com.example.sorteioservice.entity.Apostador;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
