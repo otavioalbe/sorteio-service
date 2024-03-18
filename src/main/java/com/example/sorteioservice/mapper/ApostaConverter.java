@@ -1,6 +1,7 @@
 package com.example.sorteioservice.mapper;
 
 import com.example.sorteioservice.dto.ApostadorRequestDTO;
+import com.example.sorteioservice.entity.Apostador;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -9,6 +10,11 @@ import java.util.stream.Collectors;
 public class ApostaConverter {
 
     public Set<Integer> fromStringToSet(ApostadorRequestDTO apostador){
+        String []numerosDTO = apostador.getNumerosAposta().split(",");
+        return Arrays.stream(numerosDTO).map(Integer::parseInt).collect(Collectors.toSet());
+    }
+
+    public Set<Integer> fromStringToSet(Apostador apostador){
         String []numerosDTO = apostador.getNumerosAposta().split(",");
         return Arrays.stream(numerosDTO).map(Integer::parseInt).collect(Collectors.toSet());
     }

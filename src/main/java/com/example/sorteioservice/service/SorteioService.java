@@ -2,6 +2,7 @@ package com.example.sorteioservice.service;
 
 import com.example.sorteioservice.dto.ApostadorRequestDTO;
 import com.example.sorteioservice.dto.ApostadorResponseDTO;
+import com.example.sorteioservice.entity.Apostador;
 import com.example.sorteioservice.mapper.ApostaConverter;
 import com.example.sorteioservice.mapper.ApostadorMapper;
 import com.example.sorteioservice.repository.ApostadorRepository;
@@ -27,6 +28,9 @@ public class SorteioService {
     @Autowired
     private ApostadorMapper apostadorMapper;
 
+    private Set<Integer> resultadosFinais;
+    private List<ApostadorResponseDTO> vencedores;
+
     public List<ApostadorResponseDTO> listarApostas(){
         return apostadorRepository.findAll().stream().map(ApostadorResponseDTO::new).toList();
     }
@@ -37,8 +41,10 @@ public class SorteioService {
             Set<Integer> numerosSorteados = apostaConverter.fromStringToSet(dto);
 
             if (validaNumerosSorteados(numerosSorteados)) {
+
                 var response = apostadorRepository.save(apostadorMapper.fromRequestToEntity(dto));
                 return ResponseEntity.status(HttpStatus.CREATED).body(apostadorMapper.fromEntityToResponseDTO(response));
+
             }
         }
 
@@ -51,15 +57,67 @@ public class SorteioService {
         return apostaAtiva;
     }
 
-    public String realizarSorteio(){
+    public String realizarSorteio() {
         apostaAtiva = false;
-        Set<Integer> numerosSorteados = new HashSet<>();
-        Random random = new Random();
-        while (numerosSorteados.size() < 5) {
-            int numeroSorteado = random.nextInt(50) + 1;
-            numerosSorteados.add(numeroSorteado);
+        vencedores = new ArrayList<>();
+        sorteioCincoNumeros();
+        int rodada;
+        for (rodada = 0; rodada < 25; rodada++) {
+            verificarVencedores();
+            if (!vencedores.isEmpty())
+                break;
+            sorteiaMaisUm();
         }
-        return apostaConverter.fromSetToString(numerosSorteados);
+
+        if (vencedores.isEmpty()) {
+            return "Nenhum vencedor desta vez!\nNúmeros sorteados: " + apostaConverter.fromSetToString(resultadosFinais) + "\nRodadas:" + rodada;
+        } else {
+
+            return formatacaoVencedores() + "\nNúmeros sorteados: " + apostaConverter.fromSetToString(resultadosFinais)
+                    + "\nRodadas: " + rodada;
+        }
+    }
+
+    private void verificarVencedores() {
+        for (Apostador apostador : apostadorRepository.findAll()) {
+            if (resultadosFinais.containsAll(apostaConverter.fromStringToSet(apostador))) {
+                vencedores.add(apostadorMapper.fromEntityToResponseDTO(apostador));
+            }
+        }
+    }
+
+    public String formatacaoVencedores(){
+        StringBuilder resultadoFormatado = new StringBuilder("VENCEDORES: \n");
+        String resultado = "";
+        for (ApostadorResponseDTO vencedor : vencedores) {
+            resultado = vencedor.getNumerosAposta();
+            resultadoFormatado
+                    .append("ID da aposta: " + vencedor.getId() +
+                            "\nNome: " + vencedor.getNome() +
+                            "\nCPF: " + vencedor.getCpf() + "\n\n");
+        }
+        resultadoFormatado.setLength(resultadoFormatado.length() - 2);
+        resultadoFormatado.append("\n\nNÚMEROS APOSTADOS: " + resultado +"\n");
+        return resultadoFormatado.toString();
+    }
+
+    public void sorteioCincoNumeros(){
+        resultadosFinais = new HashSet<>();
+        Random random = new Random();
+        while (resultadosFinais.size() < 5) {
+            var numeroSorteado = random.nextInt(50) + 1;
+            resultadosFinais.add(numeroSorteado);
+        }
+    }
+
+    public void sorteiaMaisUm(){
+        Random random = new Random();
+        var num = random.nextInt(50) + 1;
+        if(!resultadosFinais.contains(num)) {
+            resultadosFinais.add(num);
+        }else{
+            sorteiaMaisUm();
+        }
     }
 
     public boolean validaNumerosSorteados(Set<Integer>numerosSorteados){
