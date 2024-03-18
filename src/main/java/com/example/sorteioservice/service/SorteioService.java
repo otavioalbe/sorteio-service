@@ -1,5 +1,6 @@
 package com.example.sorteioservice.service;
 
+import com.example.sorteioservice.dto.ApostadorResponseDTO;
 import com.example.sorteioservice.entity.Apostador;
 import com.example.sorteioservice.mapper.ApostadorConverter;
 import com.example.sorteioservice.repository.ApostadorRepository;
@@ -23,12 +24,13 @@ public class SorteioService {
     @Autowired
     private ApostadorConverter apostadorConverter;
 
-    public List<Apostador> getAll(){
-        return apostadorRepository.findAll();
+    public List<ApostadorResponseDTO> getAll(){
+        List<ApostadorResponseDTO>listaApostas = apostadorRepository.findAll().stream().map(ApostadorResponseDTO::new).toList();
+        return listaApostas;
     }
 
     public ResponseEntity<Apostador> salvarAposta(Apostador dto){
-        if(apostaAtiva) {
+        if(verficarApostaAberta()) {
             Set<Integer> numerosSorteados = apostadorConverter.fromStringToSet(dto);
             if (validaNumerosSorteados(numerosSorteados)) {
                 apostadorRepository.save(dto);

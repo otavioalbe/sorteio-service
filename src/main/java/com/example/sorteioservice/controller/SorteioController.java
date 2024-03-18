@@ -1,10 +1,9 @@
 package com.example.sorteioservice.controller;
 
-import com.example.sorteioservice.dto.ApostadorDTO;
+import com.example.sorteioservice.dto.ApostadorResponseDTO;
 import com.example.sorteioservice.entity.Apostador;
 import com.example.sorteioservice.service.SorteioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,7 @@ public class SorteioController {
     }
 
     @GetMapping("/listar")
-    public List<Apostador> getAll(){
+    public List<ApostadorResponseDTO> getAll(){
         return sorteioService.getAll();
     }
 
