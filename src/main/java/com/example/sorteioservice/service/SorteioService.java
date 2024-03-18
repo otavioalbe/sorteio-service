@@ -24,9 +24,8 @@ public class SorteioService {
     @Autowired
     private ApostadorConverter apostadorConverter;
 
-    public List<ApostadorResponseDTO> getAll(){
-        List<ApostadorResponseDTO>listaApostas = apostadorRepository.findAll().stream().map(ApostadorResponseDTO::new).toList();
-        return listaApostas;
+    public List<ApostadorResponseDTO> listarApostas(){
+        return apostadorRepository.findAll().stream().map(ApostadorResponseDTO::new).toList();
     }
 
     public ResponseEntity<Apostador> salvarAposta(Apostador dto){
@@ -75,8 +74,4 @@ public class SorteioService {
             return "Erro ao limpar o cache: " + e.getMessage();
         }
     }
-
-//    public ApostadorResponse validaAposta(ApostadorResponse dto){
-//        if(dto.)
-//    }
 }

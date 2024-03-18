@@ -17,21 +17,15 @@ public class SorteioController {
     @Autowired
     private SorteioService sorteioService;
 
-    @GetMapping("/aberto")
-    public boolean apostaAberta(){
-        return sorteioService.verficarApostaAberta();
-    }
-
     @PostMapping("/apostar")
-    public ResponseEntity<Apostador> solicitaAposta(@RequestBody Apostador dto){
+    public ResponseEntity<Apostador> registraAposta(@RequestBody Apostador dto){
         return sorteioService.salvarAposta(dto);
     }
 
     @GetMapping("/listar")
-    public List<ApostadorResponseDTO> getAll(){
-        return sorteioService.getAll();
+    public List<ApostadorResponseDTO> listarApostas(){
+        return sorteioService.listarApostas();
     }
-
 
     @GetMapping("/executar-sorteio")
     public String executarSorteio(){
@@ -41,5 +35,10 @@ public class SorteioController {
     @GetMapping("/reiniciar-aposta")
     public String reiniciarAposta(){
         return sorteioService.resetAposta();
+    }
+
+    @GetMapping("/aposta-aberta")
+    public boolean isApostaAberta(){
+        return sorteioService.verficarApostaAberta();
     }
 }
