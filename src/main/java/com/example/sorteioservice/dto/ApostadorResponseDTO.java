@@ -1,8 +1,10 @@
 package com.example.sorteioservice.dto;
 
 import com.example.sorteioservice.entity.Apostador;
+import lombok.Builder;
 
-public record ApostadorResponseDTO(Long id, String cpf, String nome, String numeros_aposta) {
+@Builder
+public record ApostadorResponseDTO(Long id, String cpf, String nome, String numerosAposta) {
     public ApostadorResponseDTO(Apostador apostador){
         this(apostador.getId(), apostador.getCpf(), apostador.getNome(), apostador.getNumerosAposta());
     }

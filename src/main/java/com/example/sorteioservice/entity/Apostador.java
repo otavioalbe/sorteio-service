@@ -1,5 +1,6 @@
 package com.example.sorteioservice.entity;
 
+import com.example.sorteioservice.dto.ApostadorRequestDTO;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -31,4 +32,5 @@ public class Apostador {
     private String nome;
     @Column(name = "numeros_aposta")
     private String numerosAposta;
+
 }

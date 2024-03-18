@@ -1,8 +1,10 @@
 package com.example.sorteioservice.service;
 
+import com.example.sorteioservice.dto.ApostadorRequestDTO;
 import com.example.sorteioservice.dto.ApostadorResponseDTO;
 import com.example.sorteioservice.entity.Apostador;
-import com.example.sorteioservice.mapper.ApostadorConverter;
+import com.example.sorteioservice.mapper.ApostaConverter;
+import com.example.sorteioservice.mapper.ApostadorMapper;
 import com.example.sorteioservice.repository.ApostadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,21 +24,28 @@ public class SorteioService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private ApostadorConverter apostadorConverter;
+    private ApostaConverter apostaConverter;
+    @Autowired
+    private ApostadorMapper apostadorMapper;
 
     public List<ApostadorResponseDTO> listarApostas(){
         return apostadorRepository.findAll().stream().map(ApostadorResponseDTO::new).toList();
     }
 
-    public ResponseEntity<Apostador> salvarAposta(Apostador dto){
+    public ResponseEntity<ApostadorResponseDTO> salvarAposta(ApostadorRequestDTO dto){
         if(verficarApostaAberta()) {
-            Set<Integer> numerosSorteados = apostadorConverter.fromStringToSet(dto);
+
+            Set<Integer> numerosSorteados = apostaConverter.fromStringToSet(dto);
+
             if (validaNumerosSorteados(numerosSorteados)) {
-                apostadorRepository.save(dto);
-                return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+                var response = apostadorRepository.save(apostadorMapper.fromRequestToEntity(dto));
+                return ResponseEntity.status(HttpStatus.CREATED).body(apostadorMapper.fromEntityToResponseDTO(response));
             }
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(dto);
+
+        var badResponse = apostadorMapper.fromRequestToResponse(dto);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badResponse);
     }
 
     public boolean verficarApostaAberta(){
@@ -51,7 +60,7 @@ public class SorteioService {
             int numeroSorteado = random.nextInt(50) + 1;
             numerosSorteados.add(numeroSorteado);
         }
-        return apostadorConverter.fromSetToString(numerosSorteados);
+        return apostaConverter.fromSetToString(numerosSorteados);
     }
 
     public boolean validaNumerosSorteados(Set<Integer>numerosSorteados){
