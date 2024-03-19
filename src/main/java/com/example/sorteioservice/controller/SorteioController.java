@@ -37,6 +37,11 @@ public class SorteioController {
         return sorteioService.resetAposta();
     }
 
+    @PostMapping("/premiacao")
+    public ResponseEntity<String> premiacao(@RequestBody String cpf){
+        return sorteioService.premiacao(cpf);
+    }
+
     @GetMapping("/aposta-aberta")
     public boolean isApostaAberta(){
         return sorteioService.verficarApostaAberta();

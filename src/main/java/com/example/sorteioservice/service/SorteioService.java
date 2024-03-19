@@ -89,18 +89,17 @@ public class SorteioService {
     }
 
     public String formatacaoVencedores(){
-        Collections.sort(vencedores,Comparator.comparing(ApostadorResponseDTO::getNome));
+        vencedores.sort(Comparator.comparing(ApostadorResponseDTO::getNome));
         StringBuilder resultadoFormatado = new StringBuilder("APOSTAS VENCEDORAS (" + vencedores.size() + "): \n\n");
         String resultado = "";
+        Set<Integer> numResultado;
         for (ApostadorResponseDTO vencedor : vencedores) {
-            resultado = vencedor.getNumerosAposta();
-            resultadoFormatado
-                    .append("ID da aposta: " + vencedor.getId() +
-                            "\nNome: " + vencedor.getNome() +
-                            "\nCPF: " + vencedor.getCpf() + "\n\n");
+            numResultado = apostaConverter.fromStringToSet(vencedor);
+            resultado = apostaConverter.fromSetToString(numResultado);
+            resultadoFormatado.append("ID da aposta: ").append(vencedor.getId()).append("\nNome: ").append(vencedor.getNome()).append("\nCPF: ").append(vencedor.getCpf()).append("\n\n");
         }
         resultadoFormatado.setLength(resultadoFormatado.length() - 2);
-        resultadoFormatado.append("\n\nNÚMEROS APOSTADOS: " + resultado +"\n");
+        resultadoFormatado.append("\n\nNÚMEROS APOSTADOS: ").append(resultado).append("\n");
         return resultadoFormatado.toString();
     }
 
@@ -162,5 +161,14 @@ public class SorteioService {
         } catch (Exception e) {
             return "Erro ao limpar o cache: " + e.getMessage();
         }
+    }
+
+    public ResponseEntity<String> premiacao(String cpf) {
+        for(ApostadorResponseDTO apostador: vencedores) {
+            if (apostador.getCpf().equals(cpf)) {
+                return ResponseEntity.ok("Parabéns! Você acertou todos os números da Baita Sena!");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Infelimente não foi seu dia de sorte... Tente novamente na próxima!");
     }
 }
