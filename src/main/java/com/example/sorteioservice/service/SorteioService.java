@@ -2,7 +2,6 @@ package com.example.sorteioservice.service;
 
 import com.example.sorteioservice.dto.ApostadorRequestDTO;
 import com.example.sorteioservice.dto.ApostadorResponseDTO;
-import com.example.sorteioservice.entity.Apostador;
 import com.example.sorteioservice.mapper.ApostaConverter;
 import com.example.sorteioservice.mapper.ApostadorMapper;
 import com.example.sorteioservice.repository.ApostadorRepository;
@@ -13,11 +12,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SorteioService {
-
-    private boolean apostaAtiva = true;
 
     @Autowired
     private ApostadorRepository apostadorRepository;
@@ -28,8 +26,11 @@ public class SorteioService {
     @Autowired
     private ApostadorMapper apostadorMapper;
 
+
+    private boolean apostaAtiva = true;
     private Set<Integer> resultadosFinais;
     private List<ApostadorResponseDTO> vencedores;
+    private Map<Integer,Integer> contagemNumeros;
 
     public List<ApostadorResponseDTO> listarApostas(){
         return apostadorRepository.findAll().stream().map(ApostadorResponseDTO::new).toList();
@@ -68,26 +69,28 @@ public class SorteioService {
                 break;
             sorteiaMaisUm();
         }
-
+        listaNumApostados();
         if (vencedores.isEmpty()) {
-            return "Nenhum vencedor desta vez!\nNúmeros sorteados: " + apostaConverter.fromSetToString(resultadosFinais) + "\nRodadas:" + rodada;
+            return "Nenhum vencedor desta vez!\nNúmeros sorteados: " + apostaConverter.fromSetToString(resultadosFinais) + "\nRodadas:" + rodada
+                    + "\n\n" + obterContagemNumeros(contagemNumeros);
         } else {
 
             return formatacaoVencedores() + "\nNúmeros sorteados: " + apostaConverter.fromSetToString(resultadosFinais)
-                    + "\nRodadas: " + rodada;
+                    + "\nRodadas: " + rodada + "\n\n" + obterContagemNumeros(contagemNumeros);
         }
     }
 
     private void verificarVencedores() {
-        for (Apostador apostador : apostadorRepository.findAll()) {
+        for (ApostadorResponseDTO apostador : apostadorRepository.findAll().stream().map(ApostadorResponseDTO::new).toList()) {
             if (resultadosFinais.containsAll(apostaConverter.fromStringToSet(apostador))) {
-                vencedores.add(apostadorMapper.fromEntityToResponseDTO(apostador));
+                vencedores.add(apostador);
             }
         }
     }
 
     public String formatacaoVencedores(){
-        StringBuilder resultadoFormatado = new StringBuilder("VENCEDORES: \n");
+        Collections.sort(vencedores,Comparator.comparing(ApostadorResponseDTO::getNome));
+        StringBuilder resultadoFormatado = new StringBuilder("APOSTAS VENCEDORAS (" + vencedores.size() + "): \n\n");
         String resultado = "";
         for (ApostadorResponseDTO vencedor : vencedores) {
             resultado = vencedor.getNumerosAposta();
@@ -99,6 +102,26 @@ public class SorteioService {
         resultadoFormatado.setLength(resultadoFormatado.length() - 2);
         resultadoFormatado.append("\n\nNÚMEROS APOSTADOS: " + resultado +"\n");
         return resultadoFormatado.toString();
+    }
+
+    public void listaNumApostados(){
+        contagemNumeros = new HashMap<>();
+        for(ApostadorResponseDTO apostador: listarApostas()){
+            for(Integer aux: apostaConverter.fromStringToSet(apostador)){
+                contagemNumeros.put(aux, contagemNumeros.getOrDefault(aux,0)+1);
+            }
+        }
+    }
+
+    public String obterContagemNumeros(Map<Integer, Integer> contagemNumeros) {
+        Map<Integer, Integer> contagemNumerosOrdenados = contagemNumeros.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue, (e1,e2)-> e1, LinkedHashMap::new));
+
+        StringBuilder resultado = new StringBuilder("N° - Qtd de apostas\n");
+        for (Map.Entry<Integer, Integer> entry : contagemNumerosOrdenados.entrySet()) {
+            resultado.append(entry.getKey()).append("  -  ").append(entry.getValue()).append("\n");
+        }
+        return resultado.toString();
     }
 
     public void sorteioCincoNumeros(){
