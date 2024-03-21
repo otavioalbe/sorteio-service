@@ -71,12 +71,12 @@ public class SorteioService {
         }
         listaNumApostados();
         if (vencedores.isEmpty()) {
-            return "Nenhum vencedor desta vez!\nNúmeros sorteados: " + apostaConverter.fromSetToString(resultadosFinais) + "\nRodadas:" + rodada
-                    + "\n\n" + obterContagemNumeros(contagemNumeros);
+            return "Nenhum vencedor desta vez!<br><br>\nNúmeros sorteados:<br>" + apostaConverter.fromSetToString(resultadosFinais) + "\n<br><br>Rodadas:" + rodada
+                    + "<br><br>\n\n" + obterContagemNumeros(contagemNumeros);
         } else {
 
-            return formatacaoVencedores() + "\nNúmeros sorteados: " + apostaConverter.fromSetToString(resultadosFinais)
-                    + "\nRodadas: " + rodada + "\n\n" + obterContagemNumeros(contagemNumeros);
+            return formatacaoVencedores() + "\n<br><br>Números sorteados: " + apostaConverter.fromSetToString(resultadosFinais)
+                    + "\n<br><br>Rodadas: " + rodada + "<br><br>\n\n" + obterContagemNumeros(contagemNumeros);
         }
     }
 
@@ -96,10 +96,10 @@ public class SorteioService {
         for (ApostadorResponseDTO vencedor : vencedores) {
             numResultado = apostaConverter.fromStringToSet(vencedor);
             resultado = apostaConverter.fromSetToString(numResultado);
-            resultadoFormatado.append("ID da aposta: ").append(vencedor.getId()).append("\nNome: ").append(vencedor.getNome()).append("\nCPF: ").append(vencedor.getCpf()).append("\n\n");
+            resultadoFormatado.append("<br><br>ID da aposta: ").append(vencedor.getId()).append("\n<br>Nome: ").append(vencedor.getNome()).append("\n<br>CPF: ").append(vencedor.getCpf()).append("\n\n");
         }
         resultadoFormatado.setLength(resultadoFormatado.length() - 2);
-        resultadoFormatado.append("\n\nNÚMEROS APOSTADOS: ").append(resultado).append("\n");
+        resultadoFormatado.append("\n\n<br><br>NÚMEROS APOSTADOS: ").append(resultado).append("\n");
         return resultadoFormatado.toString();
     }
 
@@ -116,9 +116,9 @@ public class SorteioService {
         Map<Integer, Integer> contagemNumerosOrdenados = contagemNumeros.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue, (e1,e2)-> e1, LinkedHashMap::new));
 
-        StringBuilder resultado = new StringBuilder("N° - Qtd de apostas\n");
+        StringBuilder resultado = new StringBuilder("N° - Qtd de apostas\n<br>");
         for (Map.Entry<Integer, Integer> entry : contagemNumerosOrdenados.entrySet()) {
-            resultado.append(entry.getKey()).append("  -  ").append(entry.getValue()).append("\n");
+            resultado.append(entry.getKey()).append("  -  ").append(entry.getValue()).append("\n<br>");
         }
         return resultado.toString();
     }
@@ -169,6 +169,6 @@ public class SorteioService {
                 return ResponseEntity.ok("Parabéns! Você acertou todos os números da Baita Sena!");
             }
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Infelimente não foi seu dia de sorte... Tente novamente na próxima!");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Infelizmente não foi seu dia de sorte... Tente novamente na próxima!");
     }
 }

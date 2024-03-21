@@ -42,8 +42,4 @@ public class SorteioController {
         return sorteioService.premiacao(cpf);
     }
 
-    @GetMapping("/aposta-aberta")
-    public boolean isApostaAberta(){
-        return sorteioService.verficarApostaAberta();
-    }
 }
